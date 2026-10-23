@@ -1,0 +1,496 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Lihat Stok | Sapras Sekolah</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <div id="header-container"></div>
+
+    <main class="container my-4 flex-grow-1">
+
+        <!-- JUDUL DAN TOMBOL REFRESH -->
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+            <div>
+                <h1 class="h3 fw-bold mb-1">Lihat Stok Barang</h1>
+                <p class="text-secondary mb-0">
+                    Khusus Admin — pantau stok total, dipinjam, dan tersedia.
+                </p>
+            </div>
+
+            <button type="button" id="btnRefresh"
+                    class="btn btn-outline-primary">
+                Perbarui Stok
+            </button>
+        </div>
+
+        <!-- NOTIFIKASI -->
+        <div id="notifikasi" class="alert d-none" role="alert"></div>
+
+        <!-- RINGKASAN STOK -->
+        <div class="row g-3 mb-4">
+
+            <div class="col-12 col-md-4">
+                <div class="card shadow-sm h-100 p-3">
+                    <div class="text-secondary small">Jenis Barang</div>
+                    <div class="fs-3 fw-bold" id="totalJenis">0</div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="card shadow-sm h-100 p-3">
+                    <div class="text-secondary small">Total Unit Inventaris</div>
+                    <div class="fs-3 fw-bold" id="totalUnit">0</div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-4">
+                <div class="card shadow-sm h-100 p-3">
+                    <div class="text-secondary small">Unit Sedang Dipinjam</div>
+                    <div class="fs-3 fw-bold" id="totalDipinjam">0</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- TABEL STOK -->
+        <div class="card shadow-sm p-3">
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <h2 class="h5 mb-0">Rincian Stok Inventaris</h2>
+                <span class="small text-secondary" id="waktuPembaruan"></span>
+            </div>
+
+            <!-- PENCARIAN STOK -->
+            <div class="row g-2 align-items-end mb-3">
+                <div class="col-12 col-md-7 col-lg-6">
+                    <label for="searchStok" class="form-label mb-1">Cari barang</label>
+                    <div class="input-group">
+                        <span class="input-group-text" aria-hidden="true">🔎</span>
+                        <input
+                            type="search"
+                            class="form-control"
+                            id="searchStok"
+                            placeholder="Cari kode, nama, atau jumlah barang..."
+                            autocomplete="off"
+                            aria-label="Cari stok barang"
+                        >
+                        <button type="button" class="btn btn-outline-secondary" id="btnHapusSearch">
+                            Hapus
+                        </button>
+                    </div>
+                </div>
+                <div class="col-12 col-md-5 col-lg-6 text-md-end">
+                    <span class="small text-secondary" id="hasilPencarianStok" aria-live="polite">
+                        Memuat jumlah barang...
+                    </span>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Kode Barang</th>
+                            <th>Nama Barang</th>
+                            <th class="text-end">Stok Total</th>
+                            <th class="text-end">Sedang Dipinjam</th>
+                            <th class="text-end">Stok Tersedia</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tabelStok">
+                        <tr>
+                            <td colspan="5" class="text-center py-4">
+                                Memuat data stok...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+
+    <script>
+        // =========================
+        // CEK LOGIN DAN ROLE ADMIN
+        // =========================
+
+        let akunAktif = null;
+
+        try {
+            akunAktif = JSON.parse(
+                localStorage.getItem('user') || 'null'
+            );
+        } catch (error) {
+            localStorage.removeItem('user');
+        }
+
+        const roleAktif = String(akunAktif?.role || '')
+            .toLowerCase()
+            .trim();
+
+        const aksesAdmin = Boolean(
+            akunAktif && roleAktif === 'admin'
+        );
+
+        // =========================
+        // NOTIFIKASI OTOMATIS
+        // Hilang setelah 3 detik
+        // =========================
+
+        let timerNotifikasi;
+
+        function tampilkanNotifikasi(pesan, tipe = 'success') {
+            const elemen = document.getElementById('notifikasi');
+
+            // Hentikan timer notifikasi sebelumnya
+            clearTimeout(timerNotifikasi);
+
+            // Tampilkan notifikasi baru
+            elemen.textContent = pesan;
+            elemen.className = 'alert alert-' + tipe;
+            elemen.style.display = 'block';
+
+            // Hilangkan notifikasi setelah 3 detik
+            timerNotifikasi = setTimeout(function() {
+                elemen.classList.add('d-none');
+                elemen.style.display = 'none';
+            }, 3000);
+        }
+
+        // =========================
+        // LOGOUT
+        // =========================
+
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // =========================
+        // HEADER DAN FOOTER
+        // =========================
+
+        async function loadIncludes() {
+            const [headerRes, footerRes] = await Promise.all([
+                fetch('header.html'),
+                fetch('footer.html')
+            ]);
+
+            if (!headerRes.ok || !footerRes.ok) {
+                throw new Error('Header atau footer gagal dimuat.');
+            }
+
+            document.getElementById('header-container').innerHTML =
+                await headerRes.text();
+
+            document.getElementById('footer-container').innerHTML =
+                await footerRes.text();
+
+            // Sembunyikan tautan khusus Admin dari Petugas
+            document.querySelectorAll(
+                '#header-container .admin-only'
+            ).forEach(item => {
+                item.style.display =
+                    roleAktif === 'admin' ? '' : 'none';
+            });
+        }
+
+        // =========================
+        // MEMUAT DATA STOK
+        // =========================
+
+        async function loadStok() {
+            const tombol = document.getElementById('btnRefresh');
+            const tbody = document.getElementById('tabelStok');
+
+            tombol.disabled = true;
+            tombol.textContent = 'Memuat...';
+
+            try {
+                // Ambil inventaris
+                const { data: barang, error: errorBarang } = await db
+                    .from('barang')
+                    .select('id, kode_barang, nama_barang, jumlah')
+                    .order('nama_barang', { ascending: true });
+
+                if (errorBarang) throw errorBarang;
+
+                // Ambil barang yang masih dipinjam
+                const { data: pinjaman, error: errorPinjaman } = await db
+                    .from('peminjaman')
+                    .select('barang_id, jumlah')
+                    .eq('status', 'Dipinjam');
+
+                if (errorPinjaman) throw errorPinjaman;
+
+                // Hitung jumlah pinjaman per barang
+                const dipinjamPerBarang = {};
+
+                (pinjaman || []).forEach(p => {
+                    const id = String(p.barang_id);
+                    const jumlah = Number(p.jumlah || 0);
+
+                    dipinjamPerBarang[id] =
+                        (dipinjamPerBarang[id] || 0) + jumlah;
+                });
+
+                tbody.replaceChildren();
+
+                let jumlahJenis = 0;
+                let jumlahUnit = 0;
+                let jumlahSedangDipinjam = 0;
+
+                if (!barang || barang.length === 0) {
+                    const tr = document.createElement('tr');
+                    const td = document.createElement('td');
+
+                    td.colSpan = 5;
+                    td.className =
+                        'text-center text-secondary py-4';
+                    td.textContent =
+                        'Belum ada barang di inventaris.';
+
+                    tr.appendChild(td);
+                    tbody.appendChild(tr);
+
+                } else {
+                    barang.forEach(b => {
+                        const total = Number(b.jumlah);
+
+                        if (!Number.isFinite(total) || total < 0) {
+                            throw new Error(
+                                'Jumlah stok tidak valid untuk barang ' +
+                                (b.nama_barang || b.kode_barang)
+                            );
+                        }
+
+                        const dipinjam =
+                            dipinjamPerBarang[String(b.id)] || 0;
+
+                        if (dipinjam > total) {
+                            console.warn(
+                                'Jumlah peminjaman melebihi stok:',
+                                b.nama_barang
+                            );
+                        }
+
+                        // Stok tersedia tidak boleh negatif
+                        const tersedia = Math.max(
+                            0,
+                            total - dipinjam
+                        );
+
+                        jumlahJenis += 1;
+                        jumlahUnit += total;
+                        jumlahSedangDipinjam += dipinjam;
+
+                        const tr = document.createElement('tr');
+                        const kolom = [
+                            b.kode_barang || '-',
+                            b.nama_barang || '-',
+                            total,
+                            dipinjam,
+                            tersedia
+                        ];
+
+                        // Simpan teks yang bisa dicari tanpa mengubah data stok.
+                        tr.dataset.searchable = 'true';
+                        tr.dataset.search = kolom
+                            .join(' ')
+                            .toLocaleLowerCase('id-ID');
+
+                        kolom.forEach((nilai, index) => {
+                            const td = document.createElement('td');
+                            td.textContent = String(nilai);
+
+                            if (index >= 2) {
+                                td.classList.add('text-end');
+                            }
+
+                            if (index === 4) {
+                                td.classList.add(
+                                    'fw-bold',
+                                    tersedia > 0
+                                        ? 'text-success'
+                                        : 'text-danger'
+                                );
+                            }
+
+                            tr.appendChild(td);
+                        });
+
+                        tbody.appendChild(tr);
+                    });
+                }
+
+                // Perbarui ringkasan
+                document.getElementById('totalJenis').textContent =
+                    jumlahJenis;
+
+                document.getElementById('totalUnit').textContent =
+                    jumlahUnit;
+
+                document.getElementById('totalDipinjam').textContent =
+                    jumlahSedangDipinjam;
+
+                // Catat waktu pembaruan
+                document.getElementById('waktuPembaruan').textContent =
+                    'Diperbarui: ' +
+                    new Date().toLocaleString('id-ID');
+
+                // Terapkan pencarian lagi setelah data diperbarui.
+                terapkanPencarianStok();
+
+                tampilkanNotifikasi(
+                    'Data stok berhasil diperbarui.',
+                    'success'
+                );
+
+            } catch (error) {
+                console.error('Gagal memuat stok:', error);
+
+                tampilkanNotifikasi(
+                    'Gagal memuat stok: ' +
+                    (error.message || 'Kesalahan tidak diketahui.'),
+                    'danger'
+                );
+
+            } finally {
+                tombol.disabled = false;
+                tombol.textContent = 'Perbarui Stok';
+            }
+        }
+
+        // =========================
+        // PENCARIAN STOK
+        // =========================
+
+        function terapkanPencarianStok() {
+            const input = document.getElementById('searchStok');
+            const labelHasil = document.getElementById('hasilPencarianStok');
+            const tbody = document.getElementById('tabelStok');
+            if (!input || !labelHasil || !tbody) return;
+
+            const kataKunci = input.value.trim().toLocaleLowerCase('id-ID');
+            const semuaBaris = Array.from(
+                tbody.querySelectorAll('tr[data-searchable="true"]')
+            );
+
+            let jumlahCocok = 0;
+            semuaBaris.forEach(baris => {
+                const cocok = !kataKunci ||
+                    (baris.dataset.search || '').includes(kataKunci);
+                baris.classList.toggle('d-none', !cocok);
+                if (cocok) jumlahCocok += 1;
+            });
+
+            let barisKosong = document.getElementById('barisStokTidakDitemukan');
+            if (semuaBaris.length > 0 && jumlahCocok === 0) {
+                if (!barisKosong) {
+                    barisKosong = document.createElement('tr');
+                    barisKosong.id = 'barisStokTidakDitemukan';
+                    const sel = document.createElement('td');
+                    sel.colSpan = 5;
+                    sel.className = 'text-center text-secondary py-4';
+                    sel.textContent = 'Barang tidak ditemukan.';
+                    barisKosong.appendChild(sel);
+                    tbody.appendChild(barisKosong);
+                }
+            } else if (barisKosong) {
+                barisKosong.remove();
+            }
+
+            if (semuaBaris.length === 0) {
+                labelHasil.textContent = 'Belum ada data stok untuk dicari.';
+            } else {
+                labelHasil.textContent = kataKunci
+                    ? `Menampilkan ${jumlahCocok} dari ${semuaBaris.length} barang`
+                    : `Total ${semuaBaris.length} barang`;
+            }
+        }
+
+        document.getElementById('searchStok')
+            .addEventListener('input', terapkanPencarianStok);
+
+        document.getElementById('btnHapusSearch')
+            .addEventListener('click', function() {
+                const input = document.getElementById('searchStok');
+                input.value = '';
+                terapkanPencarianStok();
+                input.focus();
+            });
+
+        // =========================
+        // TOMBOL PERBARUI STOK
+        // =========================
+
+        document.getElementById('btnRefresh')
+            .addEventListener('click', loadStok);
+
+        // =========================
+        // JALANKAN HALAMAN
+        // =========================
+
+        async function init() {
+            if (
+                !akunAktif ||
+                !['admin', 'petugas'].includes(roleAktif)
+            ) {
+                localStorage.removeItem('user');
+                window.location.href = 'login.html';
+                return;
+            }
+
+            // Halaman ini khusus Admin
+            if (!aksesAdmin) {
+                document.querySelector('main').innerHTML = `
+                    <div class="alert alert-danger mt-4" role="alert">
+                        Halaman ini khusus Admin. Anda tidak memiliki
+                        akses untuk melihat stok di halaman ini.
+                    </div>`;
+
+                try {
+                    await loadIncludes();
+                } catch (error) {
+                    console.error(error);
+                }
+
+                return;
+            }
+
+            try {
+                await loadIncludes();
+                await loadStok();
+
+            } catch (error) {
+                console.error('Gagal membuka halaman:', error);
+
+                tampilkanNotifikasi(
+                    'Gagal membuka halaman: ' + error.message,
+                    'danger'
+                );
+            }
+        }
+
+        init();
+    </script>
+
+</body>
+</html>

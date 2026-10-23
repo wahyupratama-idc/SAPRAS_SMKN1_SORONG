@@ -1,0 +1,288 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Register | Sapras Sekolah</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0f172a, #1d4ed8);
+}
+
+.card {
+    background: white;
+    padding: 30px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 460px;
+}
+
+.identitas-sekolah {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 22px;
+}
+
+.logo-samping {
+    width: 55px;
+    height: 55px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.teks-sapras {
+    flex: 1;
+    min-width: 0;
+    text-align: center;
+}
+
+.teks-sapras h3 {
+    margin: 0;
+    font-size: 25px;
+    font-weight: bold;
+    color: #1d4ed8;
+    white-space: nowrap;
+}
+
+.teks-sapras p {
+    margin: 5px 0 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+}
+
+h2 {
+    text-align: center;
+    color: #1d4ed8;
+}
+
+p {
+    text-align: center;
+    color: #64748b;
+}
+
+label {
+    display: block;
+    margin: 15px 0 6px;
+    font-weight: bold;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+}
+
+button {
+    width: 100%;
+    padding: 13px;
+    margin-top: 20px;
+    border: 0;
+    border-radius: 8px;
+    background: #2563eb;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:disabled {
+    opacity: .6;
+}
+
+#pesan {
+    margin-top: 15px;
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+a {
+    color: #2563eb;
+}
+
+@media (max-width: 380px) {
+    .card {
+        padding: 22px;
+    }
+
+    .logo-samping {
+        width: 42px;
+        height: 42px;
+    }
+
+    .identitas-sekolah {
+        gap: 7px;
+    }
+
+    .teks-sapras h3 {
+        font-size: 20px;
+    }
+
+    .teks-sapras p {
+        font-size: 10px;
+    }
+}
+</style>
+</head>
+
+<body>
+<div class="card">
+
+    <div class="identitas-sekolah">
+        <img
+            src="smk.jpg"
+            alt="Foto SMK Negeri 1 Kota Sorong"
+            class="logo-samping"
+        >
+
+        <div class="teks-sapras">
+            <h3>Sapras Sekolah</h3>
+            <p>SMK Negeri 1 Kota Sorong</p>
+        </div>
+
+        <img
+            src="tutwuri.png"
+            alt="Logo Tut Wuri Handayani"
+            class="logo-samping"
+        >
+    </div>
+
+    <h2>Register Akun</h2>
+    <p>Manajemen Sarana dan Prasarana Sekolah</p>
+
+    <form id="formRegister">
+        <label for="nama">Nama lengkap</label>
+        <input id="nama" maxlength="100" required>
+
+        <label for="username">Username</label>
+        <input
+            id="username"
+            minlength="3"
+            maxlength="50"
+            pattern="[A-Za-z0-9_]+"
+            autocomplete="username"
+            required
+        >
+
+        <label for="password">Password</label>
+        <input
+            id="password"
+            type="password"
+            minlength="8"
+            autocomplete="new-password"
+            required
+        >
+
+        <label for="konfirmasi">Konfirmasi password</label>
+        <input
+            id="konfirmasi"
+            type="password"
+            minlength="8"
+            autocomplete="new-password"
+            required
+        >
+
+        <button id="btnDaftar" type="submit">
+            Daftar Sekarang
+        </button>
+
+        <div id="pesan" role="status"></div>
+    </form>
+
+    <p>Sudah punya akun? <a href="login.html">Login di sini</a></p>
+
+</div>
+
+<script>
+const formRegister = document.getElementById('formRegister');
+const pesanRegister = document.getElementById('pesan');
+const btnDaftar = document.getElementById('btnDaftar');
+
+formRegister.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const nama = document.getElementById('nama').value.trim();
+    const username = document.getElementById('username')
+        .value.trim().toLowerCase();
+    const password = document.getElementById('password').value;
+    const konfirmasi = document.getElementById('konfirmasi').value;
+
+    if (password.length < 8) {
+        pesanRegister.textContent = 'Password minimal 8 karakter.';
+        return;
+    }
+
+    if (password !== konfirmasi) {
+        pesanRegister.textContent = 'Konfirmasi password tidak cocok.';
+        return;
+    }
+
+    btnDaftar.disabled = true;
+    btnDaftar.textContent = 'Memproses...';
+    pesanRegister.textContent = '';
+
+    try {
+        const { data: akunLama, error: cekError } = await db
+            .from('users')
+            .select('id')
+            .eq('username', username)
+            .maybeSingle();
+
+        if (cekError) throw cekError;
+
+        if (akunLama) {
+            pesanRegister.textContent = 'Username sudah digunakan.';
+            return;
+        }
+
+        const { error: simpanError } = await db
+            .from('users')
+            .insert([{
+                nama: nama,
+                username: username,
+                password: password,
+                role: 'petugas'
+            }]);
+
+        if (simpanError) throw simpanError;
+
+        pesanRegister.textContent =
+            'Registrasi berhasil! Silakan login.';
+
+        formRegister.reset();
+
+        setTimeout(function() {
+            window.location.href = 'login.html';
+        }, 1200);
+
+    } catch (error) {
+        console.error(error);
+        pesanRegister.textContent =
+            'Registrasi gagal: ' + error.message;
+    } finally {
+        btnDaftar.disabled = false;
+        btnDaftar.textContent = 'Daftar Sekarang';
+    }
+});
+</script>
+</body>
+</html>
+ 

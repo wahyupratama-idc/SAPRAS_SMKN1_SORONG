@@ -1,0 +1,1578 @@
+/* =====================================
+
+   SAPRAS SMK NEGERI 1 SORONG
+
+   Responsive Desktop, Tablet, dan HP
+
+===================================== */
+
+:root {
+
+    --primary: #2563eb;
+
+    --primary-dark: #1d4ed8;
+
+    --background: #f4f7fb;
+
+    --surface: #ffffff;
+
+    --text: #1e293b;
+
+    --muted: #64748b;
+
+    --border: #e2e8f0;
+
+    --radius: 16px;
+
+    --shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+
+}
+
+* {
+
+    box-sizing: border-box;
+
+}
+
+html {
+
+    width: 100%;
+
+    min-height: 100%;
+
+    scroll-behavior: smooth;
+
+    -webkit-text-size-adjust: 100%;
+
+}
+
+body {
+
+    margin: 0;
+
+    padding: 0;
+
+    width: 100%;
+
+    min-height: 100vh;
+
+    overflow-wrap: break-word;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    color: var(--text);
+
+    background: var(--background);
+
+    font-size: 15px;
+
+    line-height: 1.6;
+
+}
+
+img {
+
+    max-width: 100%;
+
+}
+
+button,
+
+input,
+
+select,
+
+textarea {
+
+    font: inherit;
+
+}
+
+button,
+
+.btn {
+
+    min-height: 40px;
+
+    border-radius: 9px;
+
+}
+
+.btn-primary {
+
+    background: var(--primary);
+
+    border-color: var(--primary);
+
+}
+
+.btn-primary:hover {
+
+    background: var(--primary-dark);
+
+    border-color: var(--primary-dark);
+
+}
+
+/* =====================================
+
+   NAVBAR / HEADER
+
+===================================== */
+
+.navbar {
+
+    position: relative;
+
+    z-index: 1000;
+
+    background: #0f172a !important;
+
+    padding: 14px 0;
+
+    margin-bottom: 0 !important;
+
+    box-shadow: 0 3px 15px rgba(15, 23, 42, 0.12);
+
+}
+
+.navbar .container {
+
+    gap: 4px;
+
+}
+
+.navbar-brand {
+
+    white-space: normal;
+
+    font-size: clamp(15px, 1.5vw, 19px);
+
+    line-height: 1.4;
+
+}
+
+.navbar-nav {
+
+    gap: 5px;
+
+}
+
+.navbar .nav-link {
+
+    padding: 9px 12px !important;
+
+    border-radius: 8px;
+
+    transition: background 0.2s ease;
+
+}
+
+.navbar .nav-link:hover,
+
+.navbar .nav-link.active {
+
+    background: rgba(255, 255, 255, 0.12);
+
+}
+
+.navbar-toggler {
+
+    flex-shrink: 0;
+
+}
+
+/* =====================================
+
+   KONTEN UTAMA
+
+===================================== */
+
+main.container {
+
+    width: 100%;
+
+    max-width: 1440px;
+
+    padding-left: 24px;
+
+    padding-right: 24px;
+
+}
+
+main h1,
+
+main h2 {
+
+    color: #172554;
+
+    line-height: 1.35;
+
+}
+
+main > h1 {
+
+    margin-top: 4px;
+
+}
+
+/* =====================================
+
+   BANNER SEKOLAH
+
+===================================== */
+
+.school-banner {
+
+    position: relative;
+
+    isolation: isolate;
+
+    width: 100%;
+
+    height: clamp(220px, 30vw, 390px);
+
+    overflow: hidden;
+
+    border-radius: var(--radius);
+
+    background: #1e293b;
+
+    box-shadow: var(--shadow);
+
+}
+
+.school-banner-img,
+
+.school-banner .banner-sekolah {
+
+    position: absolute;
+
+    inset: 0;
+
+    display: block;
+
+    width: 100% !important;
+
+    height: 100% !important;
+
+    max-width: none !important;
+
+    object-fit: cover;
+
+    object-position: center;
+
+    border-radius: 0;
+
+    z-index: -2;
+
+}
+
+.school-banner::after {
+
+    content: "";
+
+    position: absolute;
+
+    inset: 0;
+
+    z-index: -1;
+
+    background: linear-gradient(
+
+        90deg,
+
+        rgba(15, 23, 42, 0.88) 0%,
+
+        rgba(15, 23, 42, 0.48) 55%,
+
+        rgba(15, 23, 42, 0.12) 100%
+
+    );
+
+}
+
+.school-banner-overlay {
+
+    position: absolute;
+
+    inset: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: flex-start;
+
+    padding: clamp(18px, 4vw, 48px);
+
+    color: white;
+
+    background: transparent;
+
+}
+
+.school-banner-overlay h1 {
+
+    max-width: 800px;
+
+    margin: 0 0 10px;
+
+    color: white;
+
+    font-size: clamp(22px, 3vw, 38px);
+
+    line-height: 1.25;
+
+    overflow-wrap: anywhere;
+
+}
+
+.school-banner-overlay p {
+
+    max-width: 620px;
+
+    font-size: clamp(12px, 1.3vw, 16px);
+
+    line-height: 1.6;
+
+}
+
+/* =====================================
+
+   KARTU STATISTIK
+
+===================================== */
+
+.stat-card {
+
+    height: 100%;
+
+    min-width: 0;
+
+    padding: 22px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius);
+
+    box-shadow: var(--shadow);
+
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+}
+
+.stat-icon {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 50px;
+
+    height: 50px;
+
+    margin-bottom: 16px;
+
+    border-radius: 13px;
+
+}
+
+.stat-icon svg {
+
+    display: block;
+
+    width: 26px;
+
+    height: 26px;
+
+}
+
+.icon-biru {
+
+    background: #dbeafe;
+
+    color: #2563eb;
+
+}
+
+.icon-pink {
+
+    background: #ffe4e6;
+
+    color: #e11d48;
+
+}
+
+.icon-kuning {
+
+    background: #fef3c7;
+
+    color: #b45309;
+
+}
+
+.icon-hijau {
+
+    background: #d1fae5;
+
+    color: #047857;
+
+}
+
+.stat-label {
+
+    color: var(--muted);
+
+    font-size: 13px;
+
+    line-height: 1.5;
+
+}
+
+.stat-number {
+
+    margin: 5px 0;
+
+    color: #172554;
+
+    font-size: clamp(24px, 2.4vw, 34px);
+
+    font-weight: 800;
+
+    line-height: 1.3;
+
+    overflow-wrap: anywhere;
+
+}
+
+.welcome-title {
+
+    color: #172554;
+
+    font-size: clamp(22px, 3vw, 32px);
+
+    font-weight: 750;
+
+    letter-spacing: -0.5px;
+
+}
+
+/* =====================================
+
+   MENU CEPAT
+
+===================================== */
+
+.quick-menu {
+
+    padding: 24px;
+
+    background: var(--surface);
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius);
+
+    box-shadow: var(--shadow);
+
+}
+
+.quick-link {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 14px;
+
+    height: 100%;
+
+    min-width: 0;
+
+    padding: 17px;
+
+    color: var(--text);
+
+    text-decoration: none;
+
+    background: white;
+
+    border: 1px solid var(--border);
+
+    border-radius: 12px;
+
+    transition: background 0.2s ease, border-color 0.2s ease;
+
+}
+
+.quick-link > div {
+
+    min-width: 0;
+
+}
+
+.quick-link strong {
+
+    display: block;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+}
+
+.quick-link small {
+
+    display: block;
+
+    margin-top: 4px;
+
+    color: var(--muted);
+
+    font-size: 12px;
+
+    line-height: 1.5;
+
+}
+
+.quick-icon {
+
+    width: 30px;
+
+    height: 30px;
+
+    flex-shrink: 0;
+
+}
+
+/* =====================================
+
+   FORMULIR DAN INPUT
+
+===================================== */
+
+.card {
+
+    min-width: 0;
+
+    border: 1px solid var(--border);
+
+    border-radius: var(--radius);
+
+    background: var(--surface);
+
+}
+
+.card.shadow-sm {
+
+    box-shadow: var(--shadow) !important;
+
+}
+
+.form-label {
+
+    margin-bottom: 7px;
+
+    color: #334155;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+}
+
+.form-control,
+
+.form-select {
+
+    width: 100%;
+
+    min-height: 44px;
+
+    color: var(--text);
+
+    background-color: white;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 9px;
+
+    font-size: 14px;
+
+}
+
+textarea.form-control {
+
+    min-height: 90px;
+
+    resize: vertical;
+
+}
+
+.form-control:focus,
+
+.form-select:focus {
+
+    border-color: #60a5fa;
+
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+
+}
+
+/* =====================================
+
+   TABEL DATA
+
+===================================== */
+
+.table-responsive {
+
+    width: 100%;
+
+    max-width: 100%;
+
+    overflow-x: auto;
+
+    -webkit-overflow-scrolling: touch;
+
+    border-radius: 10px;
+
+}
+
+.table {
+
+    width: 100%;
+
+    margin-bottom: 0;
+
+    vertical-align: middle;
+
+    font-size: 13px;
+
+}
+
+.table > thead > tr > th {
+
+    padding: 15px 12px;
+
+    color: #475569;
+
+    background: #f1f5f9;
+
+    border-bottom: 1px solid var(--border);
+
+    white-space: nowrap;
+
+    font-weight: 700;
+
+}
+
+.table > tbody > tr > td {
+
+    padding: 13px 12px;
+
+    border-color: #edf0f5;
+
+}
+
+.table tbody tr:last-child td {
+
+    border-bottom: 0;
+
+}
+
+.table td .btn {
+
+    margin: 2px;
+
+}
+
+.table td .form-control,
+
+.table td .form-select {
+
+    min-width: 110px;
+
+}
+
+.table td.text-nowrap {
+
+    white-space: nowrap;
+
+}
+
+/* =====================================
+
+   LOGIN DAN REGISTER
+
+===================================== */
+
+.auth-body {
+
+    display: grid;
+
+    place-items: center;
+
+    min-height: 100vh;
+
+    padding: 24px 16px;
+
+    background: linear-gradient(135deg, #eaf1fb, #f8fafc);
+
+}
+
+.auth-container {
+
+    width: 100%;
+
+    max-width: 440px;
+
+}
+
+.auth-card {
+
+    width: 100%;
+
+    padding: clamp(22px, 5vw, 34px);
+
+    background: white;
+
+    border: 1px solid rgba(226, 232, 240, 0.8);
+
+    border-radius: 20px;
+
+    box-shadow: 0 14px 45px rgba(24, 49, 83, 0.09);
+
+}
+
+.auth-card h1,
+
+.auth-card h2 {
+
+    line-height: 1.35;
+
+}
+
+.auth-card .btn {
+
+    min-height: 46px;
+
+}
+
+/* =====================================
+
+   FOOTER
+
+===================================== */
+
+.footer {
+
+    margin-top: auto;
+
+    padding: 18px 0 !important;
+
+    background: white !important;
+
+    border-top: 1px solid var(--border) !important;
+
+}
+
+.footer .container {
+
+    padding-left: 16px;
+
+    padding-right: 16px;
+
+}
+
+.footer span {
+
+    font-size: 12px;
+
+    line-height: 1.7;
+
+}
+
+/* =====================================
+
+   TABLET
+
+===================================== */
+
+@media (max-width: 991.98px) {
+
+    main.container {
+
+        padding-left: 20px;
+
+        padding-right: 20px;
+
+    }
+
+    .navbar .navbar-collapse {
+
+        padding-top: 12px;
+
+    }
+
+    .navbar-nav {
+
+        gap: 4px;
+
+    }
+
+    .navbar .nav-link {
+
+        padding: 10px 12px !important;
+
+    }
+
+    .stat-card {
+
+        padding: 18px;
+
+    }
+
+    .quick-menu {
+
+        padding: 20px;
+
+    }
+
+}
+
+/* =====================================
+
+   HP
+
+===================================== */
+
+@media (max-width: 575.98px) {
+
+    body {
+
+        font-size: 14px;
+
+    }
+
+    main.container {
+
+        padding-left: 14px;
+
+        padding-right: 14px;
+
+        margin-top: 20px !important;
+
+        margin-bottom: 24px !important;
+
+    }
+
+    main > h1 {
+
+        font-size: 23px;
+
+        margin-bottom: 16px !important;
+
+    }
+
+    .navbar {
+
+        padding: 10px 0;
+
+    }
+
+    .navbar .container {
+
+        padding-left: 14px;
+
+        padding-right: 14px;
+
+    }
+
+    .navbar-brand {
+
+        max-width: calc(100% - 65px);
+
+        font-size: 14px;
+
+        line-height: 1.4;
+
+    }
+
+    .navbar-collapse {
+
+        max-height: 70vh;
+
+        overflow-y: auto;
+
+    }
+
+    .navbar .nav-link {
+
+        padding: 11px 12px !important;
+
+    }
+
+    /* Banner lebih pendek dan proporsional */
+
+    .school-banner {
+
+        height: 235px;
+
+        margin-bottom: 22px !important;
+
+        border-radius: 13px;
+
+    }
+
+    .school-banner-overlay {
+
+        padding: 18px;
+
+    }
+
+    .school-banner-overlay h1 {
+
+        font-size: clamp(21px, 6vw, 28px);
+
+        line-height: 1.3;
+
+    }
+
+    .school-banner-overlay p {
+
+        font-size: 12px;
+
+    }
+
+    /* Statistik tetap dua kolom */
+
+    .stat-card {
+
+        padding: 14px;
+
+        border-radius: 12px;
+
+    }
+
+    .stat-icon {
+
+        width: 40px;
+
+        height: 40px;
+
+        margin-bottom: 12px;
+
+        border-radius: 10px;
+
+    }
+
+    .stat-icon svg {
+
+        width: 22px;
+
+        height: 22px;
+
+    }
+
+    .stat-label {
+
+        font-size: 12px;
+
+        line-height: 1.45;
+
+    }
+
+    .stat-number {
+
+        font-size: 25px;
+
+    }
+
+    .stat-card small {
+
+        font-size: 11px;
+
+    }
+
+    /* Menu cepat */
+
+    .quick-menu {
+
+        padding: 16px;
+
+        border-radius: 13px;
+
+    }
+
+    .quick-link {
+
+        padding: 13px;
+
+        gap: 10px;
+
+    }
+
+    .quick-icon {
+
+        width: 25px;
+
+        height: 25px;
+
+    }
+
+    .quick-link strong {
+
+        font-size: 13px;
+
+    }
+
+    .quick-link small {
+
+        font-size: 11px;
+
+    }
+
+    /* Formulir */
+
+    .card.p-4 {
+
+        padding: 17px !important;
+
+    }
+
+    .card.p-3 {
+
+        padding: 12px !important;
+
+    }
+
+    .form-label {
+
+        font-size: 13px;
+
+    }
+
+    .form-control,
+
+    .form-select {
+
+        min-height: 44px;
+
+        font-size: 16px;
+
+    }
+
+    textarea.form-control {
+
+        min-height: 85px;
+
+    }
+
+    .card form .btn {
+
+        width: 100%;
+
+        margin-bottom: 6px;
+
+    }
+
+    /* Tabel: geser di dalam kartu, bukan seluruh halaman */
+
+    .table-responsive {
+
+        overscroll-behavior-x: contain;
+
+    }
+
+    .table {
+
+        min-width: 700px;
+
+        font-size: 12px;
+
+    }
+
+    .table > thead > tr > th,
+
+    .table > tbody > tr > td {
+
+        padding: 11px 10px;
+
+    }
+
+    /* Form login/register */
+
+    .auth-body {
+
+        padding: 18px 14px;
+
+    }
+
+    .auth-card {
+
+        padding: 23px 19px;
+
+        border-radius: 16px;
+
+    }
+
+    .auth-card h1,
+
+    .auth-card h2 {
+
+        font-size: 23px;
+
+    }
+
+    .auth-container > p {
+
+        font-size: 13px;
+
+    }
+
+    /* Footer */
+
+    .footer {
+
+        padding: 15px 0 !important;
+
+    }
+
+    .footer span {
+
+        font-size: 11px;
+
+    }
+
+}
+
+/* Perangkat yang mendukung hover */
+
+@media (hover: hover) and (pointer: fine) {
+
+    .stat-card:hover {
+
+        transform: translateY(-3px);
+
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+
+    }
+
+    .quick-link:hover {
+
+        background: #f8fafc;
+
+        border-color: #bfdbfe;
+
+        color: var(--primary-dark);
+
+    }
+
+}
+
+/* Aksesibilitas: kurangi animasi jika diminta perangkat */
+
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+
+    *::before,
+
+    *::after {
+
+        scroll-behavior: auto !important;
+
+        animation-duration: 0.01ms !important;
+
+        transition-duration: 0.01ms !important;
+
+    }
+
+}
+
+.identitas-sekolah {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    margin-bottom: 20px;
+
+    width: 100%;
+
+}
+
+.logo-samping {
+
+    width: 65px;
+
+    height: 65px;
+
+    object-fit: contain;
+
+    flex-shrink: 0;
+
+}
+
+.teks-sapras {
+
+    text-align: center;
+
+    flex: 0 1 auto;
+
+}
+
+.teks-sapras h3 {
+
+    font-size: 21px;
+
+    font-weight: bold;
+
+    color: #2459df;
+
+    margin: 0;
+
+    white-space: nowrap;
+
+}
+
+.teks-sapras p {
+
+    font-size: 11px;
+
+    color: #64748b;
+
+    margin: 4px 0 0;
+
+}
+
+.header-logo-smk {
+
+    margin-left: 15px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+}
+
+.header-logo-smk img {
+
+    width: 42px;
+
+    height: 42px;
+
+    object-fit: contain;
+
+}
+
+.logo-header {
+
+    width: 42px;
+
+    height: 42px;
+
+    object-fit: contain;
+
+    margin-right: 10px;
+
+    flex-shrink: 0;
+
+}
+
+.logo-header {
+
+    width: 42px;
+
+    height: 42px;
+
+    object-fit: contain;
+
+    margin-right: 10px;
+
+    flex-shrink: 0;
+
+}
+
+/* Merapikan jarak logo di HP */
+
+@media (max-width: 576px) {
+
+    .logo-header {
+
+        width: 36px;
+
+        height: 36px;
+
+        margin-right: 4px;
+
+    }
+
+    .navbar-brand {
+
+        margin-right: 0;
+
+        font-size: 14px;
+
+    }
+
+}
+
+/* =====================================
+   HEADER DESKTOP - JARAK DEKAT DAN SATU BARIS
+   ===================================== */
+@media (min-width: 1200px) {
+    .navbar {
+        padding: 8px 0;
+    }
+
+    .navbar > .container {
+        width: 100%;
+        max-width: 1740px;
+        padding-left: 24px;
+        padding-right: 24px;
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 0;
+    }
+
+    .navbar .logo-header {
+        width: 46px;
+        height: 56px;
+        margin-right: 0 !important;
+        flex: 0 0 46px;
+        object-fit: contain;
+    }
+
+    .navbar .navbar-brand {
+        display: inline-flex;
+        align-items: center;
+        flex: 0 0 auto;
+        max-width: none;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        white-space: nowrap;
+        font-size: clamp(18px, 1.5vw, 27px);
+        line-height: 1.2;
+    }
+
+    .navbar .navbar-collapse {
+        display: flex !important;
+        flex: 0 1 auto;
+        min-width: 0;
+        width: auto;
+        margin-left: 24px;
+        padding-left: 0 !important;
+    }
+
+    .navbar .navbar-nav {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: flex-start;
+        width: auto;
+        gap: 4px;
+        margin-left: 0 !important;
+    }
+
+    .navbar .navbar-nav .nav-item {
+        flex: 0 0 auto;
+    }
+
+    .navbar .nav-link {
+        padding: 8px 8px !important;
+        white-space: nowrap;
+        font-size: clamp(14px, 1vw, 18px);
+        line-height: 1.35;
+    }
+
+    .navbar .navbar-toggler {
+        display: none;
+    }
+}
+
+/* Penyesuaian laptop supaya semua menu tetap muat */
+@media (min-width: 1200px) and (max-width: 1450px) {
+    .navbar > .container {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .navbar .logo-header {
+        width: 42px;
+        height: 52px;
+        flex-basis: 42px;
+        margin-right: 0 !important;
+    }
+
+    .navbar .navbar-brand {
+        font-size: 18px;
+    }
+
+    .navbar .navbar-collapse {
+        margin-left: 16px;
+    }
+
+    .navbar .navbar-nav {
+        gap: 2px;
+    }
+
+    .navbar .nav-link {
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+        font-size: 14px;
+    }
+}
+
+
+/* Logo SMK dan tulisan Sarpras dibuat lebih rapat */
+.navbar .container {
+    column-gap: 4px !important;
+}
+
+.navbar .logo-header {
+    margin-right: 0 !important;
+}
+
+.navbar .navbar-brand {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* FIX TERAKHIR: logo SMK dan nama SAPRAS menempel di sisi kiri */
+@media (min-width: 1200px) {
+    .navbar > .container {
+        justify-content: flex-start !important;
+    }
+
+    .navbar .logo-header {
+        margin-right: 8px !important;
+        flex: 0 0 46px;
+    }
+
+    .navbar .navbar-brand {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        flex: 0 0 auto;
+    }
+
+    .navbar .navbar-collapse {
+        margin-left: 24px !important;
+        padding-left: 0 !important;
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1450px) {
+    .navbar .logo-header {
+        flex-basis: 42px;
+        margin-right: 6px !important;
+    }
+
+    .navbar .navbar-collapse {
+        margin-left: 16px !important;
+    }
+}
+
+/* FINAL FIX: identitas sekolah tetap di kiri, menu navbar kembali ke kanan */
+@media (min-width: 1200px) {
+    .navbar > .container {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        flex-wrap: nowrap !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        padding-left: 24px !important;
+        padding-right: 24px !important;
+        column-gap: 0 !important;
+    }
+
+    .navbar .logo-header {
+        flex: 0 0 46px !important;
+        width: 46px !important;
+        height: 56px !important;
+        margin: 0 8px 0 0 !important;
+        object-fit: contain;
+    }
+
+    .navbar .navbar-brand {
+        flex: 0 0 auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        white-space: nowrap !important;
+        line-height: 1.2;
+    }
+
+    .navbar .navbar-collapse {
+        display: flex !important;
+        flex: 1 1 auto !important;
+        width: auto !important;
+        min-width: 0 !important;
+        margin-left: auto !important;
+        padding-left: 16px !important;
+    }
+
+    .navbar .navbar-nav,
+    .navbar .navbar-nav.ms-auto {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        width: 100% !important;
+        margin-left: auto !important;
+        gap: 4px !important;
+    }
+
+    .navbar .navbar-nav .nav-item {
+        flex: 0 0 auto !important;
+    }
+
+    .navbar .navbar-nav .nav-link {
+        white-space: nowrap !important;
+        padding: 8px 7px !important;
+        font-size: clamp(14px, 1vw, 18px);
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1450px) {
+    .navbar .logo-header {
+        flex-basis: 42px !important;
+        width: 42px !important;
+        height: 52px !important;
+        margin-right: 6px !important;
+    }
+
+    .navbar .navbar-collapse {
+        padding-left: 12px !important;
+    }
+
+    .navbar .navbar-nav,
+    .navbar .navbar-nav.ms-auto {
+        gap: 2px !important;
+    }
+
+    .navbar .navbar-nav .nav-link {
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+        font-size: 14px;
+    }
+}

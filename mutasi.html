@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mutasi Barang | Sapras Sekolah</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <div id="header-container"></div>
+
+    <main class="container my-4 flex-grow-1">
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+            <div>
+                <h1 class="h3 fw-bold mb-1">Mutasi Barang</h1>
+                <p class="text-secondary mb-0">Kelola perpindahan lokasi serta pencatatan barang masuk dan keluar.</p>
+            </div>
+            <span class="badge text-bg-primary px-3 py-2">Khusus Admin</span>
+        </div>
+
+        <div id="notifikasi" class="alert d-none" role="alert"></div>
+
+        <!-- Verifikasi tambahan untuk operasi mutasi; kata sandi tidak disimpan di localStorage. -->
+        <section class="card shadow-sm p-4 mb-4" id="verifikasiCard">
+            <h2 class="h5 fw-bold mb-2">Verifikasi Admin</h2>
+            <p class="text-secondary small mb-3">Masukkan ulang kata sandi akun Admin untuk membuka pencatatan dan riwayat mutasi. Verifikasi ini dilakukan oleh Supabase.</p>
+            <form id="verifikasiForm" class="row g-3 align-items-end">
+                <div class="col-md-8">
+                    <label for="passwordAdmin" class="form-label">Kata sandi Admin</label>
+                    <input type="password" class="form-control" id="passwordAdmin" autocomplete="current-password" required>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-primary w-100" type="submit" id="btnVerifikasi">Verifikasi Akses</button>
+                </div>
+            </form>
+            <div id="statusVerifikasi" class="small text-secondary mt-3" aria-live="polite">Belum diverifikasi.</div>
+        </section>
+
+        <div id="areaMutasi" class="d-none">
+            <!-- Form mutasi -->
+            <section class="card shadow-sm p-4 mb-4">
+                <h2 class="h5 fw-bold mb-3">Catat Mutasi</h2>
+                <form id="formMutasi" class="row g-3">
+                    <div class="col-md-4">
+                        <label for="jenisMutasi" class="form-label">Jenis mutasi</label>
+                        <select id="jenisMutasi" class="form-select" required>
+                            <option value="LOKASI">Mutasi lokasi barang</option>
+                            <option value="MASUK">Barang masuk (tambah stok)</option>
+                            <option value="KELUAR">Barang keluar (kurangi stok)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-8">
+                        <label for="barangId" class="form-label">Pilih barang</label>
+                        <select id="barangId" class="form-select" required>
+                            <option value="">Memuat data barang...</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="tanggalMutasi" class="form-label">Tanggal mutasi</label>
+                        <input type="date" id="tanggalMutasi" class="form-control" required>
+                    </div>
+                    <div class="col-md-4" id="jumlahGroup">
+                        <label for="jumlahMutasi" class="form-label">Jumlah unit</label>
+                        <input type="number" id="jumlahMutasi" class="form-control" min="1" step="1" value="1">
+                        <div class="form-text">Untuk barang keluar, stok yang sedang dipinjam tidak bisa dikeluarkan.</div>
+                    </div>
+                    <div class="col-md-4" id="lokasiTujuanGroup">
+                        <label for="lokasiTujuan" class="form-label">Lokasi tujuan</label>
+                        <input type="text" id="lokasiTujuan" class="form-control" maxlength="150" placeholder="Contoh: Lab RPL 2">
+                    </div>
+
+                    <div class="col-12" id="infoBarang" aria-live="polite">
+                        <div class="alert alert-light border mb-0 small">Pilih barang untuk melihat jumlah stok dan lokasi saat ini.</div>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="alasanMutasi" class="form-label">Alasan / keterangan</label>
+                        <textarea id="alasanMutasi" class="form-control" rows="2" maxlength="1000" placeholder="Contoh: penataan ulang ruang laboratorium" required></textarea>
+                    </div>
+                    <div class="col-12 d-flex flex-wrap gap-2">
+                        <button type="submit" class="btn btn-primary" id="btnSimpanMutasi">Simpan Mutasi</button>
+                        <button type="reset" class="btn btn-outline-secondary" id="btnResetMutasi">Reset Form</button>
+                    </div>
+                    <div class="col-12">
+                        <p class="text-secondary small mb-0">Mutasi lokasi memindahkan seluruh jumlah yang tercatat pada satu data inventaris, karena setiap data barang saat ini hanya memiliki satu lokasi.</p>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Riwayat mutasi -->
+            <section class="card shadow-sm p-3 p-md-4">
+                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+                    <div>
+                        <h2 class="h5 fw-bold mb-1">Riwayat Mutasi</h2>
+                        <p class="text-secondary small mb-0">Menampilkan riwayat sesuai pencarian dan jenis mutasi.</p>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm" id="btnMuatUlang">Muat Ulang</button>
+                </div>
+
+                <form id="filterForm" class="row g-2 mb-3">
+                    <div class="col-md-7">
+                        <label for="pencarian" class="visually-hidden">Cari riwayat</label>
+                        <input type="search" id="pencarian" class="form-control" placeholder="Cari kode, nama barang, lokasi, atau alasan...">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="filterJenis" class="visually-hidden">Filter jenis mutasi</label>
+                        <select id="filterJenis" class="form-select">
+                            <option value="">Semua jenis mutasi</option>
+                            <option value="LOKASI">Mutasi lokasi</option>
+                            <option value="MASUK">Barang masuk</option>
+                            <option value="KELUAR">Barang keluar</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-grid">
+                        <button type="submit" class="btn btn-secondary">Cari</button>
+                    </div>
+                </form>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>Tanggal</th>
+                                <th>Jenis</th>
+                                <th>Kode / Barang</th>
+                                <th>Jumlah</th>
+                                <th>Lokasi asal</th>
+                                <th>Lokasi tujuan</th>
+                                <th>Alasan</th>
+                                <th>Admin</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelMutasi">
+                            <tr><td colspan="8" class="text-center text-secondary py-4">Belum memuat riwayat.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="small text-secondary" id="jumlahRiwayat">0 catatan</div>
+            </section>
+        </div>
+    </main>
+
+    <div id="footer-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+
+    <script>
+        'use strict';
+
+        let akunAktif = null;
+        try {
+            akunAktif = JSON.parse(localStorage.getItem('user') || 'null');
+        } catch (error) {
+            localStorage.removeItem('user');
+        }
+
+        const roleAktif = String(akunAktif?.role || '').toLowerCase().trim();
+        if (!akunAktif || !['admin', 'petugas'].includes(roleAktif)) {
+            localStorage.removeItem('user');
+            window.location.replace('login.html');
+            throw new Error('Pengguna belum login atau role tidak valid.');
+        }
+        if (roleAktif !== 'admin') {
+            window.location.replace('dashboard.html');
+            throw new Error('Akses ditolak. Fitur Mutasi Barang hanya untuk Admin.');
+        }
+
+        const usernameAdmin = String(akunAktif.username || '').trim();
+        let passwordAdminSementara = '';
+        let daftarBarang = [];
+        let timerNotifikasi = null;
+
+        function tanggalLokalHariIni() {
+            const d = new Date();
+            return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        }
+
+        function tampilkanNotifikasi(pesan, tipe = 'success') {
+            const el = document.getElementById('notifikasi');
+            clearTimeout(timerNotifikasi);
+            el.textContent = pesan;
+            el.className = `alert alert-${tipe}`;
+            el.style.display = 'block';
+            el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            if (tipe === 'success') {
+                timerNotifikasi = setTimeout(() => {
+                    el.classList.add('d-none');
+                    el.style.display = 'none';
+                }, 4500);
+            }
+        }
+
+        function logout() {
+            passwordAdminSementara = '';
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        async function loadIncludes() {
+            const [headerResponse, footerResponse] = await Promise.all([
+                fetch('header.html'),
+                fetch('footer.html')
+            ]);
+            if (!headerResponse.ok || !footerResponse.ok) {
+                throw new Error('Header atau footer gagal dimuat.');
+            }
+            document.getElementById('header-container').innerHTML = await headerResponse.text();
+            document.getElementById('footer-container').innerHTML = await footerResponse.text();
+            document.querySelectorAll('#header-container .admin-only').forEach(menu => {
+                menu.style.display = roleAktif === 'admin' ? '' : 'none';
+            });
+            const tautanMutasi = document.querySelector('#header-container a[href="mutasi.html"]');
+            if (tautanMutasi) {
+                tautanMutasi.classList.add('active');
+                tautanMutasi.setAttribute('aria-current', 'page');
+            }
+        }
+
+        function perbaruiTampilanJenis() {
+            const jenis = document.getElementById('jenisMutasi').value;
+            const adalahLokasi = jenis === 'LOKASI';
+            document.getElementById('jumlahGroup').classList.toggle('d-none', adalahLokasi);
+            document.getElementById('jumlahMutasi').required = !adalahLokasi;
+            document.getElementById('lokasiTujuanGroup').classList.toggle('d-none', !adalahLokasi);
+            document.getElementById('lokasiTujuan').required = adalahLokasi;
+
+            const labelJumlah = document.querySelector('label[for="jumlahMutasi"]');
+            if (jenis === 'MASUK') labelJumlah.textContent = 'Jumlah unit masuk';
+            else if (jenis === 'KELUAR') labelJumlah.textContent = 'Jumlah unit keluar';
+            else labelJumlah.textContent = 'Jumlah unit';
+        }
+
+        function perbaruiInfoBarang() {
+            const id = document.getElementById('barangId').value;
+            const barang = daftarBarang.find(item => String(item.id) === id);
+            const info = document.getElementById('infoBarang');
+            info.replaceChildren();
+
+            const alert = document.createElement('div');
+            alert.className = 'alert alert-light border mb-0 small';
+            if (!barang) {
+                alert.textContent = 'Pilih barang untuk melihat jumlah stok dan lokasi saat ini.';
+            } else {
+                alert.textContent = `Stok saat ini: ${Number(barang.jumlah || 0)} unit · Lokasi saat ini: ${barang.lokasi || '-'}`;
+            }
+            info.appendChild(alert);
+        }
+
+        async function loadDaftarBarang() {
+            const select = document.getElementById('barangId');
+            select.replaceChildren();
+            const placeholder = document.createElement('option');
+            placeholder.value = '';
+            placeholder.textContent = 'Memuat data barang...';
+            select.appendChild(placeholder);
+
+            const { data, error } = await db
+                .from('barang')
+                .select('id, kode_barang, nama_barang, jumlah, lokasi')
+                .order('nama_barang', { ascending: true });
+            if (error) throw error;
+
+            daftarBarang = data || [];
+            select.replaceChildren();
+            const pilih = document.createElement('option');
+            pilih.value = '';
+            pilih.textContent = daftarBarang.length ? 'Pilih barang...' : 'Belum ada data barang';
+            select.appendChild(pilih);
+
+            daftarBarang.forEach(barang => {
+                const option = document.createElement('option');
+                option.value = String(barang.id);
+                option.textContent = `${barang.kode_barang || '-'} — ${barang.nama_barang || '-'} (stok ${Number(barang.jumlah || 0)}, lokasi ${barang.lokasi || '-'})`;
+                select.appendChild(option);
+            });
+            select.disabled = daftarBarang.length === 0;
+            perbaruiInfoBarang();
+        }
+
+        function formatTanggal(value) {
+            if (!value) return '-';
+            const tanggal = new Date(`${value}T00:00:00`);
+            return Number.isNaN(tanggal.getTime()) ? value : tanggal.toLocaleDateString('id-ID');
+        }
+
+        function labelJenis(value) {
+            if (value === 'LOKASI') return 'Mutasi Lokasi';
+            if (value === 'MASUK') return 'Barang Masuk';
+            if (value === 'KELUAR') return 'Barang Keluar';
+            return value || '-';
+        }
+
+        async function loadRiwayat() {
+            const tbody = document.getElementById('tabelMutasi');
+            tbody.replaceChildren();
+            const loading = document.createElement('tr');
+            const loadingCell = document.createElement('td');
+            loadingCell.colSpan = 8;
+            loadingCell.className = 'text-center text-secondary py-4';
+            loadingCell.textContent = 'Memuat riwayat mutasi...';
+            loading.appendChild(loadingCell);
+            tbody.appendChild(loading);
+
+            const { data, error } = await db.rpc('ambil_riwayat_mutasi', {
+                p_username: usernameAdmin,
+                p_password: passwordAdminSementara,
+                p_pencarian: document.getElementById('pencarian').value.trim() || null,
+                p_jenis: document.getElementById('filterJenis').value || null
+            });
+            if (error) throw error;
+
+            const rows = data || [];
+            tbody.replaceChildren();
+            if (rows.length === 0) {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = 8;
+                td.className = 'text-center text-secondary py-4';
+                td.textContent = 'Belum ada riwayat yang cocok.';
+                tr.appendChild(td);
+                tbody.appendChild(tr);
+            } else {
+                rows.forEach(item => {
+                    const tr = document.createElement('tr');
+                    const values = [
+                        formatTanggal(item.tanggal),
+                        labelJenis(item.jenis),
+                        `${item.kode_barang || '-'} — ${item.nama_barang || '-'}`,
+                        `${Number(item.jumlah || 0)} unit`,
+                        item.lokasi_asal || '-',
+                        item.lokasi_tujuan || '-',
+                        item.alasan || '-',
+                        item.created_by || '-'
+                    ];
+                    values.forEach((value, index) => {
+                        const td = document.createElement('td');
+                        td.textContent = String(value);
+                        if (index === 1) {
+                            const badge = document.createElement('span');
+                            badge.className = 'badge ' + (item.jenis === 'MASUK' ? 'text-bg-success' : item.jenis === 'KELUAR' ? 'text-bg-danger' : 'text-bg-primary');
+                            badge.textContent = String(value);
+                            td.replaceChildren(badge);
+                        }
+                        tr.appendChild(td);
+                    });
+                    tbody.appendChild(tr);
+                });
+            }
+            document.getElementById('jumlahRiwayat').textContent = `${rows.length} catatan ditampilkan`;
+        }
+
+        document.getElementById('verifikasiForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const button = document.getElementById('btnVerifikasi');
+            const status = document.getElementById('statusVerifikasi');
+            const password = document.getElementById('passwordAdmin').value;
+            button.disabled = true;
+            button.textContent = 'Memeriksa...';
+            status.textContent = 'Memverifikasi akun Admin...';
+
+            try {
+                const { data, error } = await db.rpc('verifikasi_admin_mutasi', {
+                    p_username: usernameAdmin,
+                    p_password: password
+                });
+                if (error) throw error;
+                if (data !== true) {
+                    passwordAdminSementara = '';
+                    throw new Error('Kata sandi tidak cocok atau akun ini bukan Admin.');
+                }
+
+                passwordAdminSementara = password;
+                document.getElementById('passwordAdmin').value = '';
+                document.getElementById('areaMutasi').classList.remove('d-none');
+                status.className = 'small text-success mt-3';
+                status.textContent = 'Akses Admin terverifikasi. Kata sandi hanya disimpan sementara selama halaman ini terbuka.';
+                await Promise.all([loadDaftarBarang(), loadRiwayat()]);
+            } catch (error) {
+                console.error('Verifikasi Admin gagal:', error);
+                status.className = 'small text-danger mt-3';
+                status.textContent = 'Verifikasi gagal: ' + (error.message || 'Kesalahan tidak diketahui.');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Verifikasi Akses';
+            }
+        });
+
+        document.getElementById('jenisMutasi').addEventListener('change', perbaruiTampilanJenis);
+        document.getElementById('barangId').addEventListener('change', perbaruiInfoBarang);
+        document.getElementById('filterForm').addEventListener('submit', async event => {
+            event.preventDefault();
+            try {
+                await loadRiwayat();
+            } catch (error) {
+                tampilkanNotifikasi('Gagal memuat riwayat: ' + error.message, 'danger');
+            }
+        });
+        document.getElementById('btnMuatUlang').addEventListener('click', async () => {
+            try {
+                await Promise.all([loadDaftarBarang(), loadRiwayat()]);
+                tampilkanNotifikasi('Data mutasi berhasil diperbarui.', 'success');
+            } catch (error) {
+                tampilkanNotifikasi('Gagal memperbarui data: ' + error.message, 'danger');
+            }
+        });
+
+        document.getElementById('formMutasi').addEventListener('reset', () => {
+            setTimeout(() => {
+                document.getElementById('tanggalMutasi').value = tanggalLokalHariIni();
+                perbaruiTampilanJenis();
+                perbaruiInfoBarang();
+            }, 0);
+        });
+
+        document.getElementById('formMutasi').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const button = document.getElementById('btnSimpanMutasi');
+            if (!passwordAdminSementara) {
+                tampilkanNotifikasi('Verifikasi Admin terlebih dahulu.', 'warning');
+                return;
+            }
+
+            const jenis = document.getElementById('jenisMutasi').value;
+            const barangId = document.getElementById('barangId').value;
+            const barang = daftarBarang.find(item => String(item.id) === barangId);
+            const jumlah = Number(document.getElementById('jumlahMutasi').value);
+            const lokasiTujuan = document.getElementById('lokasiTujuan').value.trim();
+            const tanggal = document.getElementById('tanggalMutasi').value;
+            const alasan = document.getElementById('alasanMutasi').value.trim();
+
+            if (!barang) {
+                tampilkanNotifikasi('Pilih barang yang akan dimutasi.', 'warning');
+                return;
+            }
+            if (jenis !== 'LOKASI' && (!Number.isInteger(jumlah) || jumlah < 1)) {
+                tampilkanNotifikasi('Jumlah mutasi harus berupa bilangan bulat minimal 1.', 'warning');
+                return;
+            }
+            if (jenis === 'LOKASI' && !lokasiTujuan) {
+                tampilkanNotifikasi('Isi lokasi tujuan.', 'warning');
+                return;
+            }
+            if (!tanggal || !alasan) {
+                tampilkanNotifikasi('Tanggal dan alasan mutasi wajib diisi.', 'warning');
+                return;
+            }
+
+            button.disabled = true;
+            button.textContent = 'Menyimpan...';
+            try {
+                const { data, error } = await db.rpc('catat_mutasi_barang', {
+                    p_username: usernameAdmin,
+                    p_password: passwordAdminSementara,
+                    p_barang_id: barangId,
+                    p_jenis: jenis,
+                    p_jumlah: jenis === 'LOKASI' ? null : jumlah,
+                    p_lokasi_tujuan: jenis === 'LOKASI' ? lokasiTujuan : null,
+                    p_tanggal: tanggal,
+                    p_alasan: alasan
+                });
+                if (error) throw error;
+
+                tampilkanNotifikasi(data?.message || 'Mutasi barang berhasil disimpan.', 'success');
+                document.getElementById('alasanMutasi').value = '';
+                document.getElementById('lokasiTujuan').value = '';
+                document.getElementById('jumlahMutasi').value = '1';
+                await Promise.all([loadDaftarBarang(), loadRiwayat()]);
+                document.getElementById('barangId').value = '';
+                perbaruiInfoBarang();
+            } catch (error) {
+                console.error('Gagal menyimpan mutasi:', error);
+                const message = error.message || 'Kesalahan tidak diketahui.';
+                if (/kata sandi|admin|verifikasi/i.test(message)) {
+                    passwordAdminSementara = '';
+                    document.getElementById('areaMutasi').classList.add('d-none');
+                    document.getElementById('statusVerifikasi').textContent = 'Sesi verifikasi berakhir. Silakan verifikasi ulang.';
+                }
+                tampilkanNotifikasi('Gagal menyimpan mutasi: ' + message, 'danger');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Simpan Mutasi';
+            }
+        });
+
+        (async function init() {
+            document.getElementById('tanggalMutasi').value = tanggalLokalHariIni();
+            perbaruiTampilanJenis();
+            try {
+                await loadIncludes();
+            } catch (error) {
+                console.error(error);
+                tampilkanNotifikasi('Gagal memuat header atau footer: ' + error.message, 'danger');
+            }
+        })();
+    </script>
+</body>
+</html>

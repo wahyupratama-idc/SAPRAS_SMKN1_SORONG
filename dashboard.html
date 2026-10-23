@@ -1,0 +1,414 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dashboard | Sarpras Sekolah</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+    <!-- HEADER / NAVBAR -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+            <div class="container">
+
+                <img
+                    src="SMK.png"
+                    alt="Logo SMK Negeri 1 Sorong"
+                    class="logo-header"
+                >
+
+                <a class="navbar-brand fw-bold" href="dashboard.html">
+                    Sarpras SMK Negeri 1 Sorong
+                </a>
+
+                <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+
+                        <li class="nav-item">
+                            <a class="nav-link active" href="dashboard.html">
+                                Dashboard
+                            </a>
+                        </li>
+
+                        <!-- KHUSUS ADMIN -->
+                        <li class="nav-item admin-only">
+                            <a class="nav-link" href="barang.html">
+                                Inventaris
+                            </a>
+                        </li>
+
+                        <!-- KHUSUS ADMIN -->
+                        <li class="nav-item admin-only">
+                            <a class="nav-link" href="kerusakan.html">
+                                Laporan Kerusakan
+                            </a>
+                        </li>
+
+                        <!-- ADMIN DAN PETUGAS -->
+                        <li class="nav-item">
+                            <a class="nav-link" href="peminjaman.html">
+                                Peminjaman
+                            </a>
+                        </li>
+
+                        <!-- FITUR LIHAT STOK KHUSUS ADMIN -->
+                        <li class="nav-item admin-only">
+                            <a class="nav-link" href="stok_admin.html">
+                                Lihat Stok
+                            </a>
+                        </li>
+
+                        <!-- KHUSUS ADMIN -->
+                        <li class="nav-item admin-only">
+                            <a class="nav-link" href="mutasi.html">
+                                Mutasi Barang
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link text-danger fw-semibold"
+                               href="#" onclick="logout()">
+                                Logout
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container my-4 flex-grow-1">
+
+        <!-- BANNER SEKOLAH -->
+        <div class="school-banner mb-4">
+            <img
+                src="sekolah.jpg"
+                alt="Foto SMK Negeri 1 Sorong"
+                class="school-banner-img banner-sekolah"
+                onerror="this.src='https://via.placeholder.com/1200x450?text=Foto+SMK+Negeri+1+Sorong'">
+
+            <div class="school-banner-overlay">
+                <h1 class="fw-bold mb-1" id="welcomeText">
+                    Selamat Datang di Sapras SMK Negeri 1 Sorong
+                </h1>
+
+                <p class="mb-0 text-white-50">
+                    Sistem Informasi Pengelolaan Sarana dan Prasarana Sekolah.
+                </p>
+            </div>
+        </div>
+
+        <!-- RINGKASAN DATA -->
+        <div class="mb-3">
+            <h2 class="h5 fw-bold mb-1">Ringkasan Data</h2>
+            <p class="text-secondary small">
+                Informasi terbaru mengenai sarana dan prasarana sekolah.
+            </p>
+        </div>
+
+        <!-- KARTU STATISTIK -->
+        <div class="row g-3 mb-4">
+
+            <div class="col-6 col-xl-3 dashboard-stat-col">
+                <div class="stat-card">
+                    <div class="stat-icon icon-biru">
+                        <svg viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m12 3 9 5-9 5-9-5 9-5Z"/>
+                            <path d="m3 12 9 5 9-5"/>
+                            <path d="m3 16 9 5 9-5"/>
+                        </svg>
+                    </div>
+                    <div class="stat-label">Total Jenis Barang</div>
+                    <div class="stat-number" id="statBarang">0</div>
+                    <small class="text-secondary">Data inventaris</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-xl-3 dashboard-stat-col admin-only">
+                <div class="stat-card">
+                    <div class="stat-icon icon-pink">
+                        <svg viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10.3 3.9 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"/>
+                            <path d="M12 9v4"/>
+                            <path d="M12 17h.01"/>
+                        </svg>
+                    </div>
+                    <div class="stat-label">Barang Bermasalah</div>
+                    <div class="stat-number" id="statRusak">0</div>
+                    <small class="text-secondary">Perlu diperiksa</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-xl-3 dashboard-stat-col admin-only">
+                <div class="stat-card">
+                    <div class="stat-icon icon-kuning">
+                        <svg viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="5" y="4" width="14" height="17" rx="2"/>
+                            <path d="M9 4.5V3h6v1.5"/>
+                            <path d="m8.5 12 2.2 2.2 4.8-4.8"/>
+                            <path d="M9 17h6"/>
+                        </svg>
+                    </div>
+                    <div class="stat-label">Laporan Aktif</div>
+                    <div class="stat-number" id="statLaporan">0</div>
+                    <small class="text-secondary">Belum selesai</small>
+                </div>
+            </div>
+
+            <div class="col-6 col-xl-3 dashboard-stat-col">
+                <div class="stat-card">
+                    <div class="stat-icon icon-hijau">
+                        <svg viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M7 7h13l-3-3"/>
+                            <path d="M20 7 17 10"/>
+                            <path d="M17 17H4l3 3"/>
+                            <path d="m4 17 3-3"/>
+                            <path d="M5 7v3"/>
+                            <path d="M19 17v-3"/>
+                        </svg>
+                    </div>
+                    <div class="stat-label">Peminjaman Aktif</div>
+                    <div class="stat-number" id="statPinjam">0</div>
+                    <small class="text-secondary">Belum dikembalikan</small>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- MENU CEPAT -->
+        <div class="quick-menu mb-4">
+            <h2 class="h5 fw-bold mb-1">Menu Cepat</h2>
+            <p class="text-secondary small mb-3">
+                Pilih menu sesuai hak akses akun.
+            </p>
+
+            <div class="row g-3">
+
+                <!-- KHUSUS ADMIN -->
+                <div class="col-md-4 admin-only">
+                    <a href="barang.html" class="quick-link">
+                        <svg class="quick-icon" viewBox="0 0 24 24"
+                            fill="none" stroke="#0d6efd" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m12 3 9 5-9 5-9-5 9-5Z"/>
+                            <path d="m3 12 9 5 9-5"/>
+                            <path d="m3 16 9 5 9-5"/>
+                        </svg>
+                        <div>
+                            <strong>Kelola Inventaris</strong>
+                            <small>Tambah dan periksa data barang</small>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- KHUSUS ADMIN -->
+                <div class="col-md-4 admin-only">
+                    <a href="kerusakan.html" class="quick-link">
+                        <svg class="quick-icon" viewBox="0 0 24 24"
+                            fill="none" stroke="#dc3545" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m14.7 6.3 3-3a5 5 0 0 1-6.6 6.6L5 16a2.1 2.1 0 0 0 3 3l6.1-6.1a5 5 0 0 0 6.6-6.6l-3 3-3-3Z"/>
+                        </svg>
+                        <div>
+                            <strong>Laporan Kerusakan</strong>
+                            <small>Periksa dan perbarui laporan</small>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- ADMIN DAN PETUGAS -->
+                <div class="col-md-4">
+                    <a href="peminjaman.html" class="quick-link">
+                        <svg class="quick-icon" viewBox="0 0 24 24"
+                            fill="none" stroke="#198754" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M7 7h13l-3-3"/>
+                            <path d="M20 7 17 10"/>
+                            <path d="M17 17H4l3 3"/>
+                            <path d="m4 17 3-3"/>
+                            <path d="M5 7v3"/>
+                            <path d="M19 17v-3"/>
+                        </svg>
+                        <div>
+                            <strong>Peminjaman Barang</strong>
+                            <small>Lihat data peminjaman barang</small>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- KHUSUS ADMIN: MUTASI BARANG -->
+                <div class="col-md-4 admin-only">
+                    <a href="mutasi.html" class="quick-link">
+                        <svg class="quick-icon" viewBox="0 0 24 24"
+                            fill="none" stroke="#7c3aed" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M7 7h13l-3-3"/>
+                            <path d="M20 7 17 10"/>
+                            <path d="M17 17H4l3 3"/>
+                            <path d="m4 17 3-3"/>
+                            <path d="M5 7v3"/>
+                            <path d="M19 17v-3"/>
+                        </svg>
+                        <div>
+                            <strong>Mutasi Barang</strong>
+                            <small>Catat barang masuk, keluar, dan perpindahan lokasi</small>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- FITUR LIHAT STOK KHUSUS ADMIN -->
+                <div class="col-md-4 admin-only">
+                    <a href="stok_admin.html" class="quick-link">
+                        <svg class="quick-icon" viewBox="0 0 24 24"
+                            fill="none" stroke="#0d6efd" stroke-width="1.8"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path d="m12 3 9 5-9 5-9-5 9-5Z"/>
+                            <path d="m3 12 9 5 9-5"/>
+                            <path d="m3 16 9 5 9-5"/>
+                        </svg>
+                        <div>
+                            <strong>Lihat Stok Barang</strong>
+                            <small>Pantau stok total dan ketersediaan barang</small>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="footer mt-auto py-3 bg-light border-top">
+        <div class="container text-center">
+            <span class="text-muted">
+                &copy; 2026 Sapras SMK Negeri 1 Sorong by WiFi Tetangga.
+                Hak Cipta Dilindungi.
+            </span>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+
+    <script>
+        // CEK LOGIN DAN ROLE
+        let user = null;
+
+        try {
+            user = JSON.parse(localStorage.getItem('user'));
+        } catch (err) {
+            localStorage.removeItem('user');
+        }
+
+        const role = String(user?.role || '').toLowerCase().trim();
+
+        if (!user || !['admin', 'petugas'].includes(role)) {
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        } else {
+            user.role = role;
+
+            // MENU ADMIN HANYA MUNCUL UNTUK ADMIN
+            document.querySelectorAll('.admin-only').forEach(function(menu) {
+                menu.style.display = role === 'admin' ? '' : 'none';
+            });
+
+            // Pada dashboard Petugas, hanya tampilkan dua statistik yang relevan.
+            // Dua kartu yang tersisa diperlebar agar tata letak tetap rapi.
+            if (role === 'petugas') {
+                document.querySelectorAll('.dashboard-stat-col:not(.admin-only)').forEach(function(kartu) {
+                    kartu.classList.remove('col-xl-3');
+                    kartu.classList.add('col-xl-6');
+                });
+            }
+
+            // NAMA PENGGUNA PADA BANNER
+            document.getElementById('welcomeText').textContent =
+                'Selamat Datang, ' + (user.nama || user.username);
+        }
+
+        // LOGOUT
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        // MEMUAT STATISTIK SUPABASE
+        async function loadStats() {
+            try {
+                const { count: barangCount, error: barangError } = await db
+                    .from('barang')
+                    .select('*', { count: 'exact', head: true });
+
+                if (barangError) throw barangError;
+
+                document.getElementById('statBarang').textContent =
+                    barangCount || 0;
+
+                // Statistik kerusakan dan laporan hanya dimuat untuk Admin.
+                if (role === 'admin') {
+                    const { count: rusakCount, error: rusakError } = await db
+                        .from('barang')
+                        .select('*', { count: 'exact', head: true })
+                        .neq('kondisi', 'Baik');
+
+                    if (rusakError) throw rusakError;
+
+                    document.getElementById('statRusak').textContent =
+                        rusakCount || 0;
+
+                    const { count: lapCount, error: lapError } = await db
+                        .from('laporan_kerusakan')
+                        .select('*', { count: 'exact', head: true })
+                        .neq('status', 'Selesai');
+
+                    if (lapError) throw lapError;
+
+                    document.getElementById('statLaporan').textContent =
+                        lapCount || 0;
+                }
+
+                const { count: pinjamCount, error: pinjamError } = await db
+                    .from('peminjaman')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status', 'Dipinjam');
+
+                if (pinjamError) throw pinjamError;
+
+                document.getElementById('statPinjam').textContent =
+                    pinjamCount || 0;
+
+            } catch (err) {
+                console.error('Gagal memuat statistik:', err);
+            }
+        }
+
+        if (user && ['admin', 'petugas'].includes(role)) {
+            loadStats();
+        }
+    </script>
+
+</body>
+</html>

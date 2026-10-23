@@ -1,0 +1,73 @@
+
+<header>
+    <nav class="navbar navbar-expand-xl navbar-dark bg-dark mb-4">
+        <div class="container">
+
+            <img
+                src="SMK.png"
+                alt="Logo SMK"
+                class="logo-header"
+            >
+
+            <a class="navbar-brand fw-bold" href="dashboard.html">
+                Sarpras SMK Negeri 1 Sorong
+            </a>
+
+            <button class="navbar-toggler" type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="dashboard.html">
+                            Dashboard
+                        </a>
+                    </li>
+
+                    <li class="nav-item admin-only">
+                        <a class="nav-link" href="barang.html">
+                            Inventaris
+                        </a>
+                    </li>
+
+                    <li class="nav-item admin-only">
+                        <a class="nav-link" href="kerusakan.html">
+                            Laporan Kerusakan
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="peminjaman.html">
+                            Peminjaman
+                        </a>
+                    </li>
+
+                    <!-- HANYA ADMIN -->
+                    <li class="nav-item admin-only" style="display: none;">
+                        <a class="nav-link" href="stok_admin.html">
+                            Lihat Stok
+                        </a>
+                    </li>
+
+                    <li class="nav-item admin-only">
+                        <a class="nav-link" href="mutasi.html">
+                            Mutasi Barang
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link text-danger"
+                           href="#" onclick="logout(); return false;">
+                            Logout
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
